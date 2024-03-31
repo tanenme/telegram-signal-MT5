@@ -5,38 +5,14 @@ import simple_colors
 
 app = Client("my_account")
 
-def modifyOrder(order, data):
-    mt5.initialize()
-    mt5.login(login=1561965, password='Toor2002**')
+def order(data):
+    symbol = data['symbol']
     sl = data['sl']
     tp = data['tp']
 
-    orderId = order.order
-    
-    symbol = "XAUUSD.iux"
-    point = mt5.symbol_info(symbol).point
-    symbol_info = mt5.symbol_info(symbol)
-    request = {
-        "action": mt5.TRADE_ACTION_DEAL,
-        "symbol": symbol,
-        "volume": 0.01,
-        "price": symbol_info.ask,
-        "position": orderId,
-        "sl": sl,
-        "tp": tp,
-        "comment": 'Python Script modify',
-        "type_filling": mt5.ORDER_FILLING_IOC,
-        "type_time": mt5.ORDER_TIME_GTC
-    }
-
-    order = mt5.order_send(request)
-    print(order)
-
-def order(data):
-    symbol = data['symbol']
     if data['type'] == 'buy':
         mt5.initialize()
-        mt5.login(login=1561965, password='Toor2002**')
+        mt5.login(login=311089796, password='Callista57!')
         point = mt5.symbol_info(symbol).point
         symbol_info = mt5.symbol_info(symbol)
         request = {
@@ -55,7 +31,7 @@ def order(data):
 
     elif data['type'] == 'sell':
         mt5.initialize()
-        mt5.login(login=1561965, password='Toor2002**')
+        mt5.login(login=311089796, password='Callista57!')
         point = mt5.symbol_info(symbol).point
         symbol_info = mt5.symbol_info(symbol)
         request = {
@@ -64,6 +40,8 @@ def order(data):
             "volume": 0.01,
             "type": mt5.ORDER_TYPE_SELL,
             "price": symbol_info.ask,
+            "sl": sl,
+            "tp": tp,
             "comment": 'Python Script Buy',
             "type_filling": mt5.ORDER_FILLING_IOC,
             "type_time": mt5.ORDER_TIME_GTC
@@ -71,11 +49,6 @@ def order(data):
         order = mt5.order_send(request)
         print("ORDER RESULT: ", simple_colors.green(order))
         mt5.shutdown()
-
-    # while order.comment in ['No prices', 'Requote']:
-    #     time.sleep(1)
-    #     order = mt5.order_send(request)
-    #     print(order.comment)
 
 def handle(string):
     keywords = ["sell", "buy"]
@@ -103,36 +76,36 @@ def handle(string):
                         tp2_index = string.lower().find(keyword2)
                         tp2_value = string[tp2_index + len(keyword2):].split()[0]
                         data['tp2'] = float(tp2_value)+0.00
-            data['symbol'] = 'XAUUSD.iux'
+            data['symbol'] = 'GOLD'
             for keyword3 in keywords3:
                 if keyword3 in string.lower():
                     if keyword3 == 'audjpy':
-                        data['symbol'] = 'AUDJPY.iux'
+                        data['symbol'] = 'AUDJPY'
                     elif keyword3 == 'audusd':
-                        data['symbol'] = 'AUDUSD.iux'
+                        data['symbol'] = 'AUDUSD'
                     elif keyword3 == 'eurgbp':
-                        data['symbol'] = 'EURGBP.iux'
+                        data['symbol'] = 'EURGBP'
                     elif keyword3 == 'eurjpy':
-                        data['symbol'] = 'EURJPY.iux'
+                        data['symbol'] = 'EURJPY'
                     elif keyword3 == 'eurusd':
-                        data['symbol'] = 'EURUSD.iux'              
+                        data['symbol'] = 'EURUSD'              
                     elif keyword3 == 'gbpjpy':
-                        data['symbol'] = 'GBPJPY.iux'  
+                        data['symbol'] = 'GBPJPY'  
                     elif keyword3 == 'gbpusd':
-                        data['symbol'] = 'GBPUSD.iux' 
+                        data['symbol'] = 'GBPUSD' 
                     elif keyword3 == 'nzdjpy':
-                        data['symbol'] = 'NZDJPY.iux'  
+                        data['symbol'] = 'NZDJPY'  
                     elif keyword3 == 'nzdusd':
-                        data['symbol'] = 'NZDUSD.iux'  
+                        data['symbol'] = 'NZDUSD'  
                     elif keyword3 == 'usdcad':
-                        data['symbol'] = 'USDCAD.iux'
+                        data['symbol'] = 'USDCAD'
     if data['order'] == True:
         order(data)
         print("ORDER:", simple_colors.blue(data['order']))
 
 @app.on_message()
 async def my_handler(client, message):
-    if message.chat.username == "Soodlayer2024":
+    if message.chat.username == "dosisthereal":
         if message.text:
             print("MESSAGE :", simple_colors.red(message.text))
             pesan = message.text

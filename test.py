@@ -102,7 +102,7 @@ def handle(string):
 
 @app.on_message()
 async def my_handler(client, message):
-    if message.chat.username == "dosisthereal":
+    if message.chat.username == "SoodLayer2024":
         if message.text:
             print("MESSAGE :", simple_colors.red(message.text))
             pesan = message.text

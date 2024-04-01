@@ -26,7 +26,6 @@ def order(data):
             "type_time": mt5.ORDER_TIME_GTC
         }
         order = mt5.order_send(request)
-        print("ORDER RESULT: ", simple_colors.green(order))
         mt5.shutdown()
 
     elif data['type'] == 'sell':
@@ -47,8 +46,8 @@ def order(data):
             "type_time": mt5.ORDER_TIME_GTC
         }
         order = mt5.order_send(request)
-        print("ORDER RESULT: ", simple_colors.green(order))
         mt5.shutdown()
+    return order
 
 def handle(string):
     keywords = ["sell", "buy"]
@@ -99,9 +98,7 @@ def handle(string):
                         data['symbol'] = 'NZDUSD'  
                     elif keyword3 == 'usdcad':
                         data['symbol'] = 'USDCAD'
-    if data['order'] == True:
-        order(data)
-        print("ORDER:", simple_colors.blue(data['order']))
+    return data
 
 @app.on_message()
 async def my_handler(client, message):
@@ -109,7 +106,12 @@ async def my_handler(client, message):
         if message.text:
             print("MESSAGE :", simple_colors.red(message.text))
             pesan = message.text
-            handle(pesan)
+            handleMessage = handle(pesan)
+            if handleMessage['order'] == True:
+                print("ORDER:", simple_colors.blue(handleMessage['order']))
+                orderHandle = order(handleMessage)
+                print("ORDER RESULT: ", simple_colors.green(orderHandle))
+                await app.send_message("me", orderHandle)
             print("")
 
 app.run()

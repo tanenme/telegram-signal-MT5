@@ -3,6 +3,7 @@ from telethon import events
 import MetaTrader5 as mt5
 import time
 import simple_colors
+import pytz
 
 api_id = '20145008'
 api_hash = '2422ffbeebc35d3a1027ea64785ce3b7'
@@ -55,7 +56,6 @@ def order(data):
     return order
 
 def handle(string):
-    print(string)
     keywords = ["sell", "buy"]
     keywords2 = ['sl', 'tp1', 'tp2']
     keywords3 = ['xauusd', 'gbpjpy', 'audjpy', 'audusd', 'eurgbp', 'eurjpy', 'eurusd', 'gbpusd', 'nzdjpy', 'nzdusd', 'usdcad']
@@ -110,17 +110,30 @@ client = TelegramClient('telethon', api_id, api_hash)
 
 @client.on(events.NewMessage)
 async def my_handler(event):
-    print(event)
+    message = event.message
+    sender_id = message.sender_id
+    sender = message.sender
+    utc_time = message.date
+    wib_tz = pytz.timezone('Asia/Jakarta')
+    wib_time = utc_time.astimezone(wib_tz)
+    text = message.message
+
+    print(simple_colors.red("Tipe Pesan: "), simple_colors.green(message.__class__.__name__))
+    print(simple_colors.red("Waktu Pesan: "), simple_colors.green(wib_time))
+    print(simple_colors.red("ID Pengirim: "), simple_colors.green(sender_id))
+    print(simple_colors.red("Username Pengirim: "), simple_colors.green(sender.username))
+    print(simple_colors.red("Teks Pesan: "), simple_colors.green(text))
+    # print(event)
+
     if event.chat.username == "dosisthereal":
-        message = event.message  # Mendapatkan objek pesan dari pengirim
-        text = message.text  # Mendapatkan teks pesan
         handleMessage = handle(text)
+        print(simple_colors.blue("ORDER: "), simple_colors.blue(handleMessage['order']))
         if handleMessage['order'] == True:
-            print("ORDER:", simple_colors.blue(handleMessage['order']))
             orderHandle = order(handleMessage)
             print("ORDER RESULT: ", simple_colors.green(orderHandle))
             await client.send_message("me", str(orderHandle))
-        print("")
+
+    print("")
 
 async def main():
     await client.start()

@@ -4,6 +4,7 @@ import MetaTrader5 as mt5
 import time
 import simple_colors
 import pytz
+import re
 
 api_id = '20145008'
 api_hash = '2422ffbeebc35d3a1027ea64785ce3b7'
@@ -27,6 +28,8 @@ def order(data):
             "volume": 0.01,
             "type": mt5.ORDER_TYPE_BUY,
             "price": symbol_info.ask,
+            "sl": sl,
+            "tp": tp,
             "comment": 'Python Script Buy',
             "type_filling": mt5.ORDER_FILLING_IOC,
             "type_time": mt5.ORDER_TIME_GTC
@@ -55,6 +58,15 @@ def order(data):
         mt5.shutdown()
     return order
 
+def extract_numeric_value(string):
+    pattern = r"\d+\.?\d*"
+    matches = re.findall(pattern, string)
+
+    numeric_values = [float(match) for match in matches]
+
+    return numeric_values
+
+
 def handle(string):
     keywords = ["sell", "buy"]
     keywords2 = ['sl', 'tp1', 'tp2']
@@ -62,25 +74,25 @@ def handle(string):
     data = {'order': False}
     for keyword in keywords:
         if keyword in string.lower():
-            data['order'] = True
             if keyword == 'sell':
                 data['type'] = 'sell'
             elif keyword == 'buy':
                 data['type'] = 'buy'
             for keyword2 in keywords2:
                 if keyword2 in string.lower():
+                    data['order'] = True
                     if keyword2 == 'sl':
                         sl_index = string.lower().find(keyword2)
-                        sl_value = string[sl_index + len(keyword2):].split()[0]
-                        data['sl'] = float(sl_value)+0.00
+                        sl_value = extract_numeric_value(string)[2]
+                        data['sl'] = sl_value+0.00
                     elif keyword2 == 'tp1':
                         tp1_index = string.lower().find(keyword2)
-                        tp1_value = string[tp1_index + len(keyword2):].split()[0]
-                        data['tp'] = float(tp1_value)+0.00
+                        tp1_value = extract_numeric_value(string)[4]
+                        data['tp'] = tp1_value+0.00
                     elif keyword2 == 'tp2':
                         tp2_index = string.lower().find(keyword2)
-                        tp2_value = string[tp2_index + len(keyword2):].split()[0]
-                        data['tp2'] = float(tp2_value)+0.00
+                        tp2_value = extract_numeric_value(string)[6]
+                        data['tp2'] = tp1_value+0.00
             data['symbol'] = 'GOLD'
             for keyword3 in keywords3:
                 if keyword3 in string.lower():
@@ -125,15 +137,14 @@ async def my_handler(event):
     print(simple_colors.red("Teks Pesan: "), simple_colors.green(text))
     # print(event)
 
-    if event.chat.username == "dosisthereal":
-        handleMessage = handle(text)
-        print(simple_colors.blue("ORDER: "), simple_colors.blue(handleMessage['order']))
-        if handleMessage['order'] == True:
-            orderHandle = order(handleMessage)
-            print("ORDER RESULT: ", simple_colors.green(orderHandle))
-            await client.send_message("me", str(orderHandle))
-
-    print("")
+    # if event.chat.username == "dosisthereal":
+    handleMessage = handle(text)
+    print(simple_colors.blue("ORDER: "), simple_colors.blue(handleMessage['order']))
+    if handleMessage['order'] == True:
+        orderHandle = order(handleMessage)
+        print("ORDER RESULT: ", simple_colors.green(orderHandle))
+        await client.send_message("me", f"🌱 **NEW TRADE EXCECUTE** 🌱 \n\n**{wib_time}** \n\n{str(orderHandle)}")
+    print("-----------------------------------------")
 
 async def main():
     await client.start()
